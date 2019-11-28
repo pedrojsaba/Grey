@@ -6,6 +6,7 @@ import 'package:musicplayer/database/database_client.dart';
 import 'package:musicplayer/pages/material_search.dart';
 import 'package:musicplayer/pages/now_playing.dart';
 import 'package:musicplayer/util/AAppBar.dart';
+import 'package:musicplayer/util/SongExtend.dart';
 import 'package:musicplayer/util/lastplay.dart';
 import 'package:musicplayer/util/utility.dart';
 import 'package:musicplayer/views/album.dart';
@@ -65,32 +66,33 @@ class _MusicState extends State<MusicHome> {
     setState(() => _selectedIndex = index);
   }
 
-  bool _handlingIsSelected(int pos){
-    return _selectedIndex==pos;
+  bool _handlingIsSelected(int pos) {
+    return _selectedIndex == pos;
   }
 
   initBottomItems() {
     bottomItems = [
-      new BottomItem("Home", Icons.home, null,null),
+      new BottomItem("Home", Icons.home, null, null),
       new BottomItem("Albums", Icons.album, () async {
         _onSelectItem(1);
-      },_handlingIsSelected(1)),
+      }, _handlingIsSelected(1)),
       new BottomItem("Songs", Icons.music_note, () async {
         _onSelectItem(2);
-      },_handlingIsSelected(2)),
+      }, _handlingIsSelected(2)),
       new BottomItem("Artists", Icons.person, () async {
         _onSelectItem(3);
-      },_handlingIsSelected(3)),
+      }, _handlingIsSelected(3)),
       new BottomItem("Playlists", Icons.playlist_play, () async {
         _onSelectItem(4);
-      },_handlingIsSelected(4)),
+      }, _handlingIsSelected(4)),
     ];
     bottomOptions = <Widget>[];
     for (var i = 1; i < bottomItems.length; i++) {
       var d = bottomItems[i];
       if (i == 2 || i == 4) {
-        bottomOptions
-            .add(Padding(padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.03)));
+        bottomOptions.add(Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.03)));
       }
       if (i == 3) {
         bottomOptions.add(Padding(
@@ -99,9 +101,7 @@ class _MusicState extends State<MusicHome> {
       }
       bottomOptions.add(new IconButton(
         icon: Icon(d.icon,
-            color: d.isSelected
-                ? Color(0xff373a46)
-                : Colors.blueGrey.shade600),
+            color: d.isSelected ? Color(0xff373a46) : Colors.blueGrey.shade600),
         onPressed: d.onPressed,
         tooltip: d.tooltip,
         iconSize: 32.0,
@@ -157,7 +157,11 @@ class _MusicState extends State<MusicHome> {
         print("failed to get songs");
       }
       List<Song> list = new List.from(songs);
-      for (Song song in list) db.upsertSOng(song);
+      for (Song song in list) {
+        SongExtend songExtend = new SongExtend(song.id, song.artist, song.title,
+            song.album, song.albumId, song.duration, song.uri, song.albumArt);
+        db.upsertSOng(songExtend);
+      }
       if (!mounted) {
         return;
       }
@@ -224,7 +228,9 @@ class _MusicState extends State<MusicHome> {
         key: scaffoldState,
         appBar: _selectedIndex == 0
             ? null
-            : AAppBar(title: title[_selectedIndex].toLowerCase(),),
+            : AAppBar(
+                title: title[_selectedIndex].toLowerCase(),
+              ),
         floatingActionButton: new FloatingActionButton(
             child: new FlutterLogo(
               colors: Colors.blueGrey,
@@ -282,7 +288,7 @@ class _MusicState extends State<MusicHome> {
 //                ]
 //              )
 //            ),
-          color: Colors.transparent,
+            color: Colors.transparent,
             height: 55.0,
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,

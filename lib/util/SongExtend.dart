@@ -17,6 +17,22 @@ class SongExtend extends Song {
     "timestamp"
   ];
   //Nuevo
+  SongExtend toExtend(){
+    SongExtend map = {
+      "id": id,
+      "artist": artist,
+      "title": title,
+      "album": album,
+      "albumId": albumId,
+      "duration": duration,
+      "uri": uri,
+      "albumArt": albumArt,
+      "count": count,
+      "timestamp": timestamp,
+      "isFav": isFav
+    } as SongExtend;
+    return map;
+  }
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
       "id": id,

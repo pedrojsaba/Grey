@@ -28,14 +28,15 @@ class DatabaseClient {
     var songs;
     var count;
     try {
-      count = Sqflite.firstIntValue(await _db
-          .rawQuery("SELECT COUNT(*) FROM songs"));
-    } catch(e){
+      count = Sqflite.firstIntValue(
+          await _db.rawQuery("SELECT COUNT(*) FROM songs"));
+    } catch (e) {
       print("Can't Find songs");
       return false;
     }
-    if (count!=0) {
-      List<Map> results2 = await _db.query("songs", columns: SongExtend.Columns);
+    if (count != 0) {
+      List<Map> results2 =
+          await _db.query("songs", columns: SongExtend.Columns);
 
       List<Song> songs3 = new List();
       results2.forEach((s) {
@@ -61,7 +62,6 @@ class DatabaseClient {
         if (!songs3.contains(song)) await _db.insert("songs", song.toMap());
         print("Inserted");
       }
-
     }
     return true;
   }
@@ -106,7 +106,7 @@ class DatabaseClient {
     return count;
   }
 
-  Future<List<SongExtend>> fetchSongs() async {
+  Future<List<Song>> fetchSongs() async {
     List<Map> results =
         await _db.query("songs", columns: SongExtend.Columns, orderBy: "title");
     List<Song> songs = new List();
@@ -118,8 +118,8 @@ class DatabaseClient {
   }
 
   Future<List<Song>> fetchSongsfromAlbum(int id) async {
-    List<Map> results =
-        await _db.rawQuery("select * from songs where albumid=$id order by count");
+    List<Map> results = await _db
+        .rawQuery("select * from songs where albumid=$id order by count");
     List<Song> songs = new List();
     results.forEach((s) {
       Song song = new Song.fromMap(s);
@@ -160,7 +160,8 @@ class DatabaseClient {
     //  List<Map> results = await _db.query("songs",
     // distinct: true,
     //columns: Song.Columns );
-    List<Map> results = await _db.rawQuery("select * from songs where artist='$artist' order by timestamp desc");
+    List<Map> results = await _db.rawQuery(
+        "select * from songs where artist='$artist' order by timestamp desc");
     List<Song> songs = new List();
     results.forEach((s) {
       Song song = new Song.fromMap(s);
@@ -168,8 +169,8 @@ class DatabaseClient {
     });
     return songs;
   }
-  Future<List<Song>> fetchAlbumByArtist(String artist) async{
 
+  Future<List<Song>> fetchAlbumByArtist(String artist) async {
     List<Map> results = await _db.rawQuery(
         "select distinct albumid,album,artist,albumArt from songs where artist='$artist'");
     List<Song> songs = new List();
@@ -265,8 +266,19 @@ class DatabaseClient {
     return songs;
   }
 
-  Future<int> updateSong(SongExtend song) async {
+  Future<int> updateSong(Song songBase) async {
     int id = 0;
+    SongExtend song;
+    song.id = songBase.id;
+    song.artist = songBase.artist;
+    song.title = songBase.title;
+    song.album = songBase.album;
+    song.albumId = songBase.albumId;
+    song.duration = songBase.duration;
+    song.uri = songBase.uri;
+    song.albumArt = songBase.albumArt;
+    song.count = songBase.count;
+    song.isFav = songBase.isFav;
     var count = Sqflite.firstIntValue(await _db
         .rawQuery("SELECT COUNT(*) FROM songs WHERE id = ?", [song.id]));
     if (count == 0) {
@@ -347,20 +359,23 @@ class DatabaseClient {
     });
     return songs;
   }
-  Future<List<String>> searchAlbum(String query)async{
-    List<Map> results = await _db.rawQuery("select * from songs where album like '%$query%'");
+
+  Future<List<String>> searchAlbum(String query) async {
+    List<Map> results =
+        await _db.rawQuery("select * from songs where album like '%$query%'");
     List<String> albums = List();
-    results.forEach((s){
+    results.forEach((s) {
       Song song = new Song.fromMap(s);
       albums.add(song.album);
     });
     return albums;
   }
 
-  Future<List<String>> searchArtist(String query) async{
-    List<Map> results = await _db.rawQuery("select * from songs where artist like '%$query%'");
+  Future<List<String>> searchArtist(String query) async {
+    List<Map> results =
+        await _db.rawQuery("select * from songs where artist like '%$query%'");
     List<String> artists = List();
-    results.forEach((s){
+    results.forEach((s) {
       Song song = new Song.fromMap(s);
       artists.add(song.artist);
     });
